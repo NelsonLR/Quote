@@ -7,6 +7,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Quote.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Quote.Controllers
 {
@@ -51,8 +53,7 @@ namespace Quote.Controllers
             }
             return View(quotation);
         }
-
-        // GET: /Quotation/Create
+        [Authorize]
         public ActionResult Create()
         {
             ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "name");
@@ -79,6 +80,7 @@ namespace Quote.Controllers
         }
 
         // GET: /Quotation/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -112,6 +114,7 @@ namespace Quote.Controllers
         }
 
         // GET: /Quotation/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -137,6 +140,7 @@ namespace Quote.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize]
         public ActionResult CreateCategory()
         {
             return View();
@@ -198,6 +202,13 @@ namespace Quote.Controllers
             var quotes = from q in db.Quotations where !hideItems.Select(x => int.Parse(x)).Contains(q.QuotationID) select q;
 
             return View(quotes.ToList());
+        }
+
+        private UserManager<ApplicationUser> manager;
+
+        public QuotationController()
+        {
+            manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
         }
     }
 }
